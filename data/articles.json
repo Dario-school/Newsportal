@@ -1,0 +1,34 @@
+{
+  "articles": [
+    {
+      "titel": "Schulausflug nach Bern",
+      "autor": "Anna Müller",
+      "datum": "2025-03-10",
+      "datei": "artikel1.pdf"
+    },
+    {
+      "titel": "Interview mit dem Schulleiter",
+      "autor": "Max Meier",
+      "datum": "2025-03-18",
+      "datei": "artikel2.pdf"
+    },
+    {
+      "titel": "Sporttag 2025 – Rückblick",
+      "autor": "Lena Keller",
+      "datum": "2025-03-22",
+      "datei": "artikel3.pdf"
+    },
+    {
+      "titel": "Neues aus der Schulbibliothek",
+      "autor": "Jonas Bauer",
+      "datum": "2025-02-14",
+      "datei": "artikel4.pdf"
+    },
+    {
+      "titel": "Theaterprojekt – Proben laufen auf Hochtouren",
+      "autor": "Sara Huber",
+      "datum": "2025-01-30",
+      "datei": "artikel5.pdf"
+    }
+  ]
+}
