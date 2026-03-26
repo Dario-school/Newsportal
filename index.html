@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Schulportal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/css/style.css" />
+  <!-- EmailJS SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+  <script>
+    // ⚠️ DEINE EMAILJS-DATEN HIER EINTRAGEN:
+    const EMAILJS_PUBLIC_KEY   = "DEIN_PUBLIC_KEY";    // z.B. "abc123XYZ"
+    const EMAILJS_SERVICE_ID   = "DEIN_SERVICE_ID";    // z.B. "service_abc123"
+    const EMAILJS_TEMPLATE_ID  = "DEIN_TEMPLATE_ID";   // z.B. "template_abc123"
+    // E-Mail-Empfänger (fest eingetragen):
+    const RECIPIENT_EMAIL      = "jedescheise@gmail.com";
+  </script>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header id="site-header">
+    <div class="header-inner">
+      <div class="header-left">
+        <button id="back-btn" class="btn btn-back" style="display:none;" aria-label="Zurück zur Startseite">
+          <span class="btn-icon">←</span>
+          <span>Zurück</span>
+        </button>
+        <div id="logo-area" class="logo-area">
+          <div class="logo-mark">
+            <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+              <rect width="32" height="32" rx="8" fill="#1A6B50"/>
+              <path d="M8 22L16 10L24 22" stroke="#00E676" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+              <circle cx="16" cy="10" r="2" fill="#69F0AE"/>
+            </svg>
+          </div>
+          <div class="logo-text">
+            <span class="logo-name">Schulportal</span>
+            <span class="logo-tagline">Nachrichten &amp; Artikel</span>
+          </div>
+        </div>
+      </div>
+
+      <div id="header-center" class="header-center">
+        <div class="search-wrapper">
+          <span class="search-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+            </svg>
+          </span>
+          <input
+            type="text"
+            id="search-input"
+            class="search-input"
+            placeholder="Artikel oder Autor suchen…"
+            autocomplete="off"
+            aria-label="Artikel suchen"
+          />
+          <button id="search-clear" class="search-clear" style="display:none;" aria-label="Suche leeren">✕</button>
+        </div>
+      </div>
+
+      <div class="header-right">
+        <button id="publish-btn" class="btn btn-publish" aria-label="Artikel veröffentlichen">
+          <span class="btn-icon">＋</span>
+          <span>Veröffentlichen</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN CONTENT -->
+  <main id="main-content">
+
+    <!-- HOME VIEW -->
+    <section id="home-view" class="view active">
+      <div class="section-header">
+        <div class="section-title-group">
+          <h1 class="section-title">Alle Artikel</h1>
+          <span id="article-count" class="article-count">— Beiträge</span>
+        </div>
+        <div id="search-status" class="search-status" style="display:none;"></div>
+      </div>
+
+      <div id="article-grid" class="article-grid">
+        <!-- Artikel werden per JS eingefügt -->
+      </div>
+
+      <div id="empty-state" class="empty-state" style="display:none;">
+        <div class="empty-icon">📭</div>
+        <p class="empty-title">Keine Artikel gefunden</p>
+        <p class="empty-sub">Versuche einen anderen Suchbegriff.</p>
+      </div>
+
+      <div id="loading-state" class="loading-state">
+        <div class="spinner"></div>
+        <p>Artikel werden geladen…</p>
+      </div>
+    </section>
+
+    <!-- PDF VIEWER VIEW -->
+    <section id="viewer-view" class="view">
+      <div class="viewer-meta" id="viewer-meta">
+        <h2 id="viewer-title" class="viewer-title"></h2>
+        <div class="viewer-info">
+          <span id="viewer-author" class="viewer-author"></span>
+          <span class="viewer-sep">·</span>
+          <span id="viewer-date" class="viewer-date"></span>
+        </div>
+      </div>
+      <div class="pdf-embed-wrapper">
+        <iframe id="pdf-frame" class="pdf-frame" title="PDF Artikel" src="" allowfullscreen></iframe>
+        <div id="pdf-fallback" class="pdf-fallback" style="display:none;">
+          <p>Dein Browser kann das PDF nicht direkt anzeigen.</p>
+          <a id="pdf-download-link" href="#" class="btn btn-publish" download>PDF herunterladen</a>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- PUBLISH MODAL -->
+  <div id="modal-overlay" class="modal-overlay" style="display:none;" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 id="modal-title" class="modal-title">Artikel veröffentlichen</h2>
+        <button id="modal-close" class="modal-close" aria-label="Modal schliessen">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="modal-info-box">
+          <strong>So funktioniert's:</strong> Fülle das Formular aus, wähle dein PDF und klicke auf «Einreichen». Eine E-Mail mit dem PDF und dem JSON-Eintrag wird automatisch verschickt.
+        </div>
+        <div class="form-group">
+          <label for="form-title" class="form-label">Titel <span class="required">*</span></label>
+          <input type="text" id="form-title" class="form-input" placeholder="z.B. Schulausflug nach Bern" />
+        </div>
+        <div class="form-group">
+          <label for="form-author" class="form-label">Autor / Autorin <span class="required">*</span></label>
+          <input type="text" id="form-author" class="form-input" placeholder="z.B. Anna Müller" />
+        </div>
+        <div class="form-group">
+          <label for="form-date" class="form-label">Datum <span class="required">*</span></label>
+          <input type="date" id="form-date" class="form-input" />
+        </div>
+        <div class="form-group">
+          <label for="form-pdf" class="form-label">PDF-Datei <span class="required">*</span></label>
+          <label for="form-pdf" class="pdf-upload-label" id="pdf-upload-label">
+            <span class="pdf-upload-icon">📄</span>
+            <span id="pdf-upload-text">PDF auswählen oder hierher ziehen</span>
+          </label>
+          <input type="file" id="form-pdf" accept=".pdf" style="display:none;" />
+          <span class="form-hint">Wird direkt als Anhang mitgeschickt. Max. 5 MB.</span>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Generierter JSON-Eintrag</label>
+          <div class="json-output-wrapper">
+            <pre id="json-output" class="json-output">← Fülle die Felder aus</pre>
+            <button id="copy-btn" class="copy-btn" aria-label="JSON kopieren">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/>
+              </svg>
+              Kopieren
+            </button>
+          </div>
+        </div>
+
+        <!-- Status-Meldung -->
+        <div id="send-status" class="send-status" style="display:none;"></div>
+
+        <!-- Senden-Button -->
+        <button id="send-btn" class="btn btn-send-full">
+          <span id="send-btn-icon">📨</span>
+          <span id="send-btn-text">Artikel einreichen &amp; E-Mail senden</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script src="assets/js/main.js"></script>
+  <script src="assets/js/search.js"></script>
+  <script src="assets/js/viewer.js"></script>
+  <script src="assets/js/publish.js"></script>
+</body>
+</html>
